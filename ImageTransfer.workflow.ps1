@@ -375,5 +375,7 @@ workflow Copy-All-Blobs
 	"Blob copy operation completed with success." | Out-File "c:\$scriptName.txt" -Append
 }
 
+$script = [System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.MyCommand.Definition)
+$folder = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Definition)
 
-Copy-All-Blobs -scriptName "test" -currentScriptFolder "test" -scriptRoot $PSScriptRoot -SourceImage $SourceImage -SourceSAKey $SourceSAKey -DestinationURI $DestinationURI -DestinationSAKey $DestinationSAKey -OtherSourceImage $OtherSourceImage -OtherSourceSAKey $OtherSourceSAKey -OtherDestinationURI $OtherDestinationURI -OtherDestinationSAKey $OtherDestinationSAKey
+Copy-All-Blobs -scriptName $script -currentScriptFolder $folder -scriptRoot $PSScriptRoot -SourceImage $SourceImage -SourceSAKey $SourceSAKey -DestinationURI $DestinationURI -DestinationSAKey $DestinationSAKey -OtherSourceImage $OtherSourceImage -OtherSourceSAKey $OtherSourceSAKey -OtherDestinationURI $OtherDestinationURI -OtherDestinationSAKey $OtherDestinationSAKey
