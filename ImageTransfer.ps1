@@ -222,6 +222,11 @@ try
 	$azCopyTool = Join-Path $installFolder "AzCopy\Azcopy.exe"
 
 	"Azcopy Path => $AzCopyTool" | Out-File "c:\$scriptName.txt" -Append
+	
+	#
+	# Copying blobs
+	#
+
 	"Source images URLs =>" | Out-File "c:\$scriptName.txt" -Append 
 	foreach ($url in $sourceImageList)
 	{
@@ -231,8 +236,6 @@ try
 	"SourceSAKey => $SourceSAKey" | Out-File "c:\$scriptName.txt" -Append
 	"DestinationURI => $DestinationURI" | Out-File "c:\$scriptName.txt" -Append
 	"DestinationSAKey => $DestinationSAKey" | Out-File "c:\$scriptName.txt" -Append
-
-	# Copying blobs
 
 	foreach ($url in $sourceImageList)
 	{
@@ -264,6 +267,30 @@ try
 		}
 	}
 
+
+	#
+	# Copy other blobs
+	#
+
+	$otherSourceImageList = $OtherSourceImage.Split(",", [StringSplitOptions]::RemoveEmptyEntries)
+	$otherSourceSAKeyList = $OtherSourceSAKey.Split(",", [StringSplitOptions]::RemoveEmptyEntries)
+    $otherDestinationURIList = $OtherDestinationURI.Split(",", [StringSplitOptions]::RemoveEmptyEntries)
+	$otherDestinationSAKeyList = $OtherDestinationSAKey.Split(",", [StringSplitOptions]::RemoveEmptyEntries)
+	
+	"Other source images URLs =>" | Out-File "c:\$scriptName.txt" -Append 
+	foreach ($url in $otherSourceImageList)
+	{
+		"    $url" | Out-File "c:\$scriptName.txt" -Append 
+	}
+
+	"OtherSourceSAKey => $OtherSourceSAKey" | Out-File "c:\$scriptName.txt" -Append
+	"OtherDestinationURI => $OtherDestinationURI" | Out-File "c:\$scriptName.txt" -Append
+	"OtherDestinationSAKey => $OtherDestinationSAKey" | Out-File "c:\$scriptName.txt" -Append
+
+
+
+
+	
 	"Blob copy operation completed with success." | Out-File "c:\$scriptName.txt" -Append
 }
 catch
