@@ -14,21 +14,7 @@
 .PARAMETER DestinationURI
 	DestinationURI - URI up to container level where blob(s) will be copied
 .PARAMETER DestinationSAKey 
-    DestinationSAKey - Destination storage account Key
-    
-
-
-.PARAMETER OtherSourceImage
-	OtherSourceImage - Contains one or more full path URLs to source VHDs, if more than one must be provided, make them comma separated
-.PARAMETER OtherSourceSAKey 
-	OtherSourceSAKey - Source storage account Key
-.PARAMETER OtherDestinationURI
-	OtherDestinationURI - URI up to container level where blob(s) will be copied
-.PARAMETER OtherDestinationSAKey 
-	OtherDestinationSAKey - Destination storage account Key
-
-
-
+	DestinationSAKey - Destination storage account Key
 .NOTE
     AzCopy must always be updated to the latest version otherwise it mail fail executing it, Visual Studio solution must use the latest version.
 .DISCLAIMER
@@ -57,21 +43,7 @@ param
 	[string]$DestinationURI,
 
 	[Parameter(Mandatory=$true)]
-	[string]$DestinationSAKey,
-
-
-    
-    [Parameter(Mandatory = $true)]
-    [string]$OtherSourceImage,
-
-    [Parameter(Mandatory = $true)]
-    [string]$OtherSourceSAKey,
-
-    [Parameter(Mandatory = $true)]
-    [string]$OtherDestinationURI,
-
-    [Parameter(Mandatory = $true)]
-    [string]$OtherDestinationSAKey
+	[string]$DestinationSAKey
 
 )
 
