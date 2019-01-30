@@ -8,13 +8,25 @@
 				E.g.
 				https://pmcsa06.blob.core.windows.net/system/Microsoft.Compute/Images/myimage01.vhd
 				https://pmcsa06.blob.core.windows.net/system/Microsoft.Compute/Images/myimage01.vhd,https://pmcsa06.blob.core.windows.net/system/Microsoft.Compute/Images/myimage02.vhd
-
 .PARAMETER SourceSAKey 
 	SourceSAKey - Source storage account Key
+
+.PARAMETER OtherSourceImage
+	OtherSourceImage - Contains one or more full path URLs to source VHDs, if more than one must be provided, make them comma separated
+.PARAMETER OtherSourceSAKey 
+	OtherSourceSAKey - Source storage account Key
+
 .PARAMETER DestinationURI
 	DestinationURI - URI up to container level where blob(s) will be copied
 .PARAMETER DestinationSAKey 
 	DestinationSAKey - Destination storage account Key
+
+.PARAMETER OtherDestinationURI
+	OtherDestinationURI - URI up to container level where blob(s) will be copied
+.PARAMETER OtherDestinationSAKey 
+	OtherDestinationSAKey - Destination storage account Key
+
+
 .NOTE
     AzCopy must always be updated to the latest version otherwise it mail fail executing it, Visual Studio solution must use the latest version.
 .DISCLAIMER
@@ -245,7 +257,7 @@ try {
 			$index = $array.IndexOf($item)
 			$key = $otherDestinationSAKeyList[$index]
 			
-            "Copying blob $url" | Out-File "c:\$scriptName.txt" -Append
+            "Copying other blob $url" | Out-File "c:\$scriptName.txt" -Append
 	
             $SourceURIContainer = getPathUpToContainerLevelfromUrl -url $url
             "   SourceURIContainer = $SourceURIContainer" | Out-File "c:\$scriptName.txt" -Append
