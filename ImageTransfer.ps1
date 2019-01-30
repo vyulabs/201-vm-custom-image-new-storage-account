@@ -273,7 +273,6 @@ try
 	#
 
 	$otherSourceImageList = $OtherSourceImage.Split(",", [StringSplitOptions]::RemoveEmptyEntries)
-	$otherSourceSAKeyList = $OtherSourceSAKey.Split(",", [StringSplitOptions]::RemoveEmptyEntries)
     $otherDestinationURIList = $OtherDestinationURI.Split(",", [StringSplitOptions]::RemoveEmptyEntries)
 	$otherDestinationSAKeyList = $OtherDestinationSAKey.Split(",", [StringSplitOptions]::RemoveEmptyEntries)
 	
@@ -288,9 +287,44 @@ try
 	"OtherDestinationSAKey => $OtherDestinationSAKey" | Out-File "c:\$scriptName.txt" -Append
 
 
+	foreach ($url in $otherSourceImageList)
+	{
+		"Copying blob $url" | Out-File "c:\$scriptName.txt" -Append
+
+		foreach ($destURL in $otherDestinationURIList) {
+
+			$index = $otherDestinationURIList.IndexOf($destURL)
+			$destKey = $otherDestinationSAKeyList[$index]
 
 
-	
+			$SourceURIContainer = getPathUpToContainerLevelfromUrl -url $url
+			"   SourceURIContainer = $SourceURIContainer" | Out-File "c:\$scriptName.txt" -Append
+
+			$blobName = getBlobName -url $url
+			"   BlobName = $blobName" | Out-File "c:\$scriptName.txt" -Append
+
+			$azCopyLogFile = "$PSScriptRoot\azcopylog-$blobName.txt"
+			"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
+
+			"   Running AzCopy Tool..." | Out-File "c:\$scriptName.txt" -Append
+			& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+
+			"   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
+			# Checking blob copy status
+			$result = getBlobCompletionStatus -AzCopyLogFile $azCopyLogFile
+			if ($result.Success)
+			{
+				"Blob $url successfuly transfered to $destURL" | Out-File "c:\$scriptName.txt" -Append
+				"   Elapsed time $($result.ElapsedTime)" | Out-File "c:\$scriptName.txt" -Append
+			}
+			else
+			{
+				throw "Blob $url copy failed to $destURL, please analyze logs and retry operation."
+			}
+		}
+	}
+
+
 	"Blob copy operation completed with success." | Out-File "c:\$scriptName.txt" -Append
 }
 catch
