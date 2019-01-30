@@ -190,7 +190,6 @@ function getBlobCompletionStatus
 
 workflow Copy-All-Blobs
 {
-	
 	Param
 	(
 	 [Parameter(Mandatory=$true)]
@@ -200,7 +199,38 @@ workflow Copy-All-Blobs
 	 [string]$currentScriptFolder,
 
 	 [Parameter(Mandatory=$true)]
-	 [string]$scriptRoot
+	 [string]$scriptRoot,
+
+	 
+
+	 
+	[Parameter(Mandatory=$true)]
+	[string]$SourceImage,
+
+	[Parameter(Mandatory=$true)]
+	[string]$SourceSAKey,
+
+	[Parameter(Mandatory=$true)]
+	[string]$DestinationURI,
+
+	[Parameter(Mandatory=$true)]
+	[string]$DestinationSAKey,
+
+
+    
+    [Parameter(Mandatory = $true)]
+    [string]$OtherSourceImage,
+
+    [Parameter(Mandatory = $true)]
+    [string]$OtherSourceSAKey,
+
+    [Parameter(Mandatory = $true)]
+    [string]$OtherDestinationURI,
+
+    [Parameter(Mandatory = $true)]
+    [string]$OtherDestinationSAKey
+
+
 	)
 
 	$sourceImageList = $SourceImage.Split(",",[StringSplitOptions]::RemoveEmptyEntries)
@@ -227,8 +257,9 @@ workflow Copy-All-Blobs
 	"Installing AzCopy" | Out-File "c:\$scriptName.txt" -Append
 
 	$azCopyInstallLogFileName = "$currentScriptFolder\azCopyInstallLog.txt"
-
-	Invoke-Command -ScriptBlock { & cmd /c "msiexec.exe /i $localPath /log $azCopyInstallLogFileName" /qn}
+	InlineScript {
+		Invoke-Command -ScriptBlock { & cmd /c "msiexec.exe /i $localPath /log $azCopyInstallLogFileName" /qn}
+	}
 
 	$installLog = Get-Content $azCopyInstallLogFileName
 	$installFolder = ($installLog | ? {$_ -match "AZURESTORAGETOOLSFOLDER"}).Split("=")[1].Trim()
@@ -283,7 +314,6 @@ workflow Copy-All-Blobs
 			throw "Blob $url copy failed to $DestinationURI, please analyze logs and retry operation."
 		}
 	}
-
 
 	#
 	# Copy other blobs
@@ -346,11 +376,4 @@ workflow Copy-All-Blobs
 }
 
 
-try
-{
-	Copy-All-Blobs -scriptName [System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.MyCommand.Definition) -currentScriptFolder [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Definition) -scriptRoot $PSScriptRoot
-}
-catch
-{
-	"An error ocurred: $_" | Out-File "c:\$scriptName.txt" -Append
-}
+Copy-All-Blobs -scriptName "test" -currentScriptFolder "test" -scriptRoot $PSScriptRoot -SourceImage $SourceImage -SourceSAKey $SourceSAKey -DestinationURI $DestinationURI -DestinationSAKey $DestinationSAKey -OtherSourceImage $OtherSourceImage -OtherSourceSAKey $OtherSourceSAKey -OtherDestinationURI $OtherDestinationURI -OtherDestinationSAKey $OtherDestinationSAKey
