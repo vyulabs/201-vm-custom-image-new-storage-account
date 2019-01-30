@@ -272,7 +272,6 @@ try {
         }
     }
 
-
     "Blob copy operation completed with success." | Out-File "c:\$scriptName.txt" -Append
 }
 catch {
