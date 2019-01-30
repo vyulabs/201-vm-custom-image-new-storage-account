@@ -187,12 +187,24 @@ function getBlobCompletionStatus
 
 # Script start
 
-try
+
+workflow Copy-All-Blobs
 {
+	
+	Param
+	(
+	 [Parameter(Mandatory=$true)]
+	 [string]$scriptName,
+  
+	 [Parameter(Mandatory=$true)]
+	 [string]$currentScriptFolder,
+
+	 [Parameter(Mandatory=$true)]
+	 [string]$scriptRoot
+	)
+
 	$sourceImageList = $SourceImage.Split(",",[StringSplitOptions]::RemoveEmptyEntries)
 
-	$scriptName = [System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.MyCommand.Definition)
-	$currentScriptFolder = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Definition)
 	"Current folder $currentScriptFolder" | Out-File "c:\$scriptName.txt"
 
 	# Downloading and installing AzCopt
@@ -207,8 +219,10 @@ try
 	} 
       
 	"Saving file at [$localPath]" | Out-File "c:\$scriptName.txt" -Append
-	$client = new-object System.Net.WebClient 
-	$client.DownloadFile($url, $localPath) 
+	$client = new-object System.Net.WebClient
+	InlineScript {
+		$client.DownloadFile($url, $localPath) 
+	}
 
 	"Installing AzCopy" | Out-File "c:\$scriptName.txt" -Append
 
@@ -237,7 +251,7 @@ try
 	"DestinationURI => $DestinationURI" | Out-File "c:\$scriptName.txt" -Append
 	"DestinationSAKey => $DestinationSAKey" | Out-File "c:\$scriptName.txt" -Append
 
-	foreach ($url in $sourceImageList)
+	foreach -Parallel ($url in $sourceImageList)
 	{
 		"Copying blob $url" | Out-File "c:\$scriptName.txt" -Append
 	
@@ -247,11 +261,14 @@ try
 		$blobName = getBlobName -url $url
 		"   BlobName = $blobName" | Out-File "c:\$scriptName.txt" -Append
 
-		$azCopyLogFile = "$PSScriptRoot\azcopylog-$blobName.txt"
+		# $PSScriptRoot
+		$azCopyLogFile = "$scriptRoot\azcopylog-$blobName.txt"
 		"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
 
 		"   Running AzCopy Tool..." | Out-File "c:\$scriptName.txt" -Append
-		& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+		InlineScript {
+			& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+		}
 
 		"   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
 		# Checking blob copy status
@@ -286,7 +303,7 @@ try
 	"OtherDestinationURI => $OtherDestinationURI" | Out-File "c:\$scriptName.txt" -Append
 	"OtherDestinationSAKey => $OtherDestinationSAKey" | Out-File "c:\$scriptName.txt" -Append
 
-	foreach ($url in $otherSourceImageList)
+	foreach -Parallel ($url in $otherSourceImageList)
 	{
 		"Copying blob $url" | Out-File "c:\$scriptName.txt" -Append
 
@@ -302,11 +319,13 @@ try
 			$blobName = getBlobName -url $url
 			"   BlobName = $blobName" | Out-File "c:\$scriptName.txt" -Append
 
-			$azCopyLogFile = "$PSScriptRoot\azcopylog-$blobName.txt"
+			$azCopyLogFile = "$scriptRoot\azcopylog-$blobName.txt"
 			"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
 
 			"   Running AzCopy Tool..." | Out-File "c:\$scriptName.txt" -Append
-			& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+			InlineScript {
+				& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+			}
 
 			"   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
 			# Checking blob copy status
@@ -323,8 +342,13 @@ try
 		}
 	}
 
-
 	"Blob copy operation completed with success." | Out-File "c:\$scriptName.txt" -Append
+}
+
+
+try
+{
+	Copy-All-Blobs -scriptName [System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.MyCommand.Definition) -currentScriptFolder [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Definition) -scriptRoot $PSScriptRoot
 }
 catch
 {
