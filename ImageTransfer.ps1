@@ -233,7 +233,7 @@ try {
 
 
 	#
-	# Copying 
+	# Copying other images
 	#
 
     "OtherSourceSAKey => $OtherSourceSAKey" | Out-File "c:\$scriptName.txt" -Append
