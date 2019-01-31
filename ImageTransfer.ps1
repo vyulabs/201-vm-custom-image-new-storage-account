@@ -261,7 +261,7 @@ try
 	$jobsCount = $jobs.Count
 	"Waiting $jobsCount jobs..." | Out-File "c:\$scriptName.txt" -Append
 
-	$jobs | Wait-Job 
+	$jobs | Wait-Job -Force
 
 	#
 	# Copy other blobs
@@ -314,7 +314,7 @@ try
 	$jobsCount = $jobs.Count
 	"Waiting $jobsCount jobs..." | Out-File "c:\$scriptName.txt" -Append
 
-	$jobs | Wait-Job 
+	$jobs | Wait-Job -Force
 
 	"Blob copy operation completed with success." | Out-File "c:\$scriptName.txt" -Append
 }
