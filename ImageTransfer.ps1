@@ -237,6 +237,8 @@ try
 	"DestinationURI => $DestinationURI" | Out-File "c:\$scriptName.txt" -Append
 	"DestinationSAKey => $DestinationSAKey" | Out-File "c:\$scriptName.txt" -Append
 
+	$jobs = @()
+
 	foreach ($url in $sourceImageList)
 	{
 		"Copying blob $url" | Out-File "c:\$scriptName.txt" -Append
@@ -251,7 +253,12 @@ try
 		"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
 
 		"   Running AzCopy Tool..." | Out-File "c:\$scriptName.txt" -Append
-		& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+
+		$copyBlock = { & $AzCopyTool $args }
+
+		$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+
+		# & $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
 
 		"   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
 		# Checking blob copy status
@@ -306,7 +313,12 @@ try
 			"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
 
 			"   Running AzCopy Tool..." | Out-File "c:\$scriptName.txt" -Append
-			& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+			
+			$copyBlock = { & $AzCopyTool $args }
+
+			$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+
+			# & $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
 
 			"   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
 			# Checking blob copy status
@@ -321,6 +333,8 @@ try
 				throw "Blob $url copy failed to $destURL, please analyze logs and retry operation."
 			}
 		}
+
+		$jobs | Wait-Job 
 	}
 
 
