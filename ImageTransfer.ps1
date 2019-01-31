@@ -213,14 +213,10 @@ try
 	"Installing AzCopy" | Out-File "c:\$scriptName.txt" -Append
 
 	$azCopyInstallLogFileName = "$currentScriptFolder\azCopyInstallLog.txt"
-
 	Invoke-Command -ScriptBlock { & cmd /c "msiexec.exe /i $localPath /log $azCopyInstallLogFileName" /qn}
-
 	$installLog = Get-Content $azCopyInstallLogFileName
 	$installFolder = ($installLog | ? {$_ -match "AZURESTORAGETOOLSFOLDER"}).Split("=")[1].Trim()
-
 	$azCopyTool = Join-Path $installFolder "AzCopy\Azcopy.exe"
-
 	"Azcopy Path => $AzCopyTool" | Out-File "c:\$scriptName.txt" -Append
 	
 	#
@@ -255,10 +251,11 @@ try
 		"   Running AzCopy Tool..." | Out-File "c:\$scriptName.txt" -Append
 
 		$copyBlock = {
-			& $AzCopyTool @args
+			param($AzCopyTool, $SourceURIContainer, $SourceSAKey, $DestinationURI, $DestinationSAKey, $blobName, $azCopyLogFile, $scriptRoot)
+			& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$scriptRoot", "/NC:20"
 		}
 
-		$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList "/Source:$SourceURIContainer", "/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+		$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList $AzCopyTool, $SourceURIContainer, $SourceSAKey, $DestinationURI, $DestinationSAKey, $blobName, $azCopyLogFile, $PSScriptRoot
 
 		# & $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
 
@@ -315,11 +312,15 @@ try
 			"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
 
 			"   Running AzCopy Tool..." | Out-File "c:\$scriptName.txt" -Append
+
+			$copyBlock = {
+				param($AzCopyTool, $SourceURIContainer, $SourceSAKey, $DestinationURI, $DestinationSAKey, $blobName, $azCopyLogFile, $scriptRoot)
+				& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$scriptRoot", "/NC:20"
+			}
+	
+			$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList $AzCopyTool, $SourceURIContainer, $OtherSourceSAKey, $destURL, $destKey, $blobName, $azCopyLogFile, $PSScriptRoot
+
 			
-			$copyBlock = { & $AzCopyTool @args }
-
-			$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
-
 			# & $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
 
 			# "   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
