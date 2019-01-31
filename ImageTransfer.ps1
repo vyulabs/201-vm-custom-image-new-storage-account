@@ -234,6 +234,8 @@ try
 	"DestinationSAKey => $DestinationSAKey" | Out-File "c:\$scriptName.txt" -Append
 
 	$jobs = @()
+	
+
 
 	foreach ($url in $sourceImageList)
 	{
@@ -245,6 +247,9 @@ try
 		$blobName = getBlobName -url $url
 		"   BlobName = $blobName" | Out-File "c:\$scriptName.txt" -Append
 
+		$tmpDir = Get-Random
+		New-Item -Path $scriptRoot -Name $tmpDir -ItemType Directory
+
 		$azCopyLogFile = "$PSScriptRoot\azcopylog-$blobName.txt"
 		"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
 
@@ -252,7 +257,7 @@ try
 
 		$copyBlock = {
 			param($AzCopyTool, $SourceURIContainer, $SourceSAKey, $DestinationURI, $DestinationSAKey, $blobName, $azCopyLogFile, $scriptRoot)
-			& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$scriptRoot", "/NC:20"
+			& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$scriptRoot\$tmpDir", "/NC:20"
 		}
 
 		$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList $AzCopyTool, $SourceURIContainer, $SourceSAKey, $DestinationURI, $DestinationSAKey, $blobName, $azCopyLogFile, $PSScriptRoot
@@ -293,12 +298,14 @@ try
 			$index = $otherDestinationURIList.IndexOf($destURL)
 			$destKey = $otherDestinationSAKeyList[$index]
 
-
 			$SourceURIContainer = getPathUpToContainerLevelfromUrl -url $url
 			"   SourceURIContainer = $SourceURIContainer" | Out-File "c:\$scriptName.txt" -Append
 
 			$blobName = getBlobName -url $url
 			"   BlobName = $blobName" | Out-File "c:\$scriptName.txt" -Append
+
+			$tmpDir = Get-Random
+			New-Item -Path $scriptRoot -Name $tmpDir -ItemType Directory	
 
 			$azCopyLogFile = "$PSScriptRoot\azcopylog-$blobName.txt"
 			"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
@@ -307,7 +314,7 @@ try
 
 			$copyBlock = {
 				param($AzCopyTool, $SourceURIContainer, $SourceSAKey, $DestinationURI, $DestinationSAKey, $blobName, $azCopyLogFile, $scriptRoot)
-				& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$scriptRoot", "/NC:20"
+				& $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$scriptRoot\$tmpDir", "/NC:20"
 			}
 	
 			$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList $AzCopyTool, $SourceURIContainer, $OtherSourceSAKey, $destURL, $destKey, $blobName, $azCopyLogFile, $PSScriptRoot
