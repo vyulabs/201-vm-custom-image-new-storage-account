@@ -256,23 +256,12 @@ try
 		}
 
 		$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList $AzCopyTool, $SourceURIContainer, $SourceSAKey, $DestinationURI, $DestinationSAKey, $blobName, $azCopyLogFile, $PSScriptRoot
-
-		# & $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
-
-		# "   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
-		# # Checking blob copy status
-		# $result = getBlobCompletionStatus -AzCopyLogFile $azCopyLogFile
-		# if ($result.Success)
-		# {
-		# 	"Blob $url successfuly transfered to $DestinationURI" | Out-File "c:\$scriptName.txt" -Append
-		# 	"   Elapsed time $($result.ElapsedTime)" | Out-File "c:\$scriptName.txt" -Append
-		# }
-		# else
-		# {
-		# 	throw "Blob $url copy failed to $DestinationURI, please analyze logs and retry operation."
-		# }
 	}
 
+	$jobsCount = $jobs.Count
+	"Waiting $jobsCount jobs..." | Out-File "c:\$scriptName.txt" -Append
+
+	$jobs | Wait-Job 
 
 	#
 	# Copy other blobs
@@ -319,26 +308,11 @@ try
 			}
 	
 			$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList $AzCopyTool, $SourceURIContainer, $OtherSourceSAKey, $destURL, $destKey, $blobName, $azCopyLogFile, $PSScriptRoot
-
-			
-			# & $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
-
-			# "   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
-			# # Checking blob copy status
-			# $result = getBlobCompletionStatus -AzCopyLogFile $azCopyLogFile
-			# if ($result.Success)
-			# {
-			# 	"Blob $url successfuly transfered to $destURL" | Out-File "c:\$scriptName.txt" -Append
-			# 	"   Elapsed time $($result.ElapsedTime)" | Out-File "c:\$scriptName.txt" -Append
-			# }
-			# else
-			# {
-			# 	throw "Blob $url copy failed to $destURL, please analyze logs and retry operation."
-			# }
 		}
 	}
 
-	"Waiting jobs..." | Out-File "c:\$scriptName.txt" -Append
+	$jobsCount = $jobs.Count
+	"Waiting $jobsCount jobs..." | Out-File "c:\$scriptName.txt" -Append
 
 	$jobs | Wait-Job 
 
