@@ -254,9 +254,11 @@ try
 
 		"   Running AzCopy Tool..." | Out-File "c:\$scriptName.txt" -Append
 
-		$copyBlock = { & $AzCopyTool $args }
+		$copyBlock = {
+			& $AzCopyTool @args
+		}
 
-		$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
+		$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList "/Source:$SourceURIContainer", "/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
 
 		# & $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
 
@@ -314,7 +316,7 @@ try
 
 			"   Running AzCopy Tool..." | Out-File "c:\$scriptName.txt" -Append
 			
-			$copyBlock = { & $AzCopyTool $args }
+			$copyBlock = { & $AzCopyTool @args }
 
 			$jobs += Start-Job -ScriptBlock $copyBlock -ArgumentList "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
 
