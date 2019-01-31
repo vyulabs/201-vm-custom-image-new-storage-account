@@ -260,18 +260,18 @@ try
 
 		# & $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$SourceSAKey", "/Dest:$DestinationURI", "/DestKey:$DestinationSAKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
 
-		"   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
-		# Checking blob copy status
-		$result = getBlobCompletionStatus -AzCopyLogFile $azCopyLogFile
-		if ($result.Success)
-		{
-			"Blob $url successfuly transfered to $DestinationURI" | Out-File "c:\$scriptName.txt" -Append
-			"   Elapsed time $($result.ElapsedTime)" | Out-File "c:\$scriptName.txt" -Append
-		}
-		else
-		{
-			throw "Blob $url copy failed to $DestinationURI, please analyze logs and retry operation."
-		}
+		# "   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
+		# # Checking blob copy status
+		# $result = getBlobCompletionStatus -AzCopyLogFile $azCopyLogFile
+		# if ($result.Success)
+		# {
+		# 	"Blob $url successfuly transfered to $DestinationURI" | Out-File "c:\$scriptName.txt" -Append
+		# 	"   Elapsed time $($result.ElapsedTime)" | Out-File "c:\$scriptName.txt" -Append
+		# }
+		# else
+		# {
+		# 	throw "Blob $url copy failed to $DestinationURI, please analyze logs and retry operation."
+		# }
 	}
 
 
@@ -320,18 +320,18 @@ try
 
 			# & $AzCopyTool "/Source:$SourceURIContainer","/SourceKey:$OtherSourceSAKey", "/Dest:$destURL", "/DestKey:$destKey", "/Pattern:$blobName", "/Y" , "/V:$azCopyLogFile", "/Z:$PSScriptRoot", "/NC:20"
 
-			"   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
-			# Checking blob copy status
-			$result = getBlobCompletionStatus -AzCopyLogFile $azCopyLogFile
-			if ($result.Success)
-			{
-				"Blob $url successfuly transfered to $destURL" | Out-File "c:\$scriptName.txt" -Append
-				"   Elapsed time $($result.ElapsedTime)" | Out-File "c:\$scriptName.txt" -Append
-			}
-			else
-			{
-				throw "Blob $url copy failed to $destURL, please analyze logs and retry operation."
-			}
+			# "   Checking blob copy status..." | Out-File "c:\$scriptName.txt" -Append
+			# # Checking blob copy status
+			# $result = getBlobCompletionStatus -AzCopyLogFile $azCopyLogFile
+			# if ($result.Success)
+			# {
+			# 	"Blob $url successfuly transfered to $destURL" | Out-File "c:\$scriptName.txt" -Append
+			# 	"   Elapsed time $($result.ElapsedTime)" | Out-File "c:\$scriptName.txt" -Append
+			# }
+			# else
+			# {
+			# 	throw "Blob $url copy failed to $destURL, please analyze logs and retry operation."
+			# }
 		}
 	}
 
