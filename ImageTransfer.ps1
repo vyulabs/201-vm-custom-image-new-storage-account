@@ -333,10 +333,11 @@ try
 				throw "Blob $url copy failed to $destURL, please analyze logs and retry operation."
 			}
 		}
-
-		$jobs | Wait-Job 
 	}
 
+	"Waiting jobs..." | Out-File "c:\$scriptName.txt" -Append
+
+	$jobs | Wait-Job 
 
 	"Blob copy operation completed with success." | Out-File "c:\$scriptName.txt" -Append
 }
