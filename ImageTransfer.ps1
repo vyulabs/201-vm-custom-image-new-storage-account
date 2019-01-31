@@ -248,7 +248,7 @@ try
 		"   BlobName = $blobName" | Out-File "c:\$scriptName.txt" -Append
 
 		$tmpDir = Get-Random
-		New-Item -Path $scriptRoot -Name $tmpDir -ItemType Directory
+		New-Item -Path $PSScriptRoot -Name $tmpDir -ItemType Directory
 
 		$azCopyLogFile = "$PSScriptRoot\azcopylog-$blobName.txt"
 		"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
@@ -305,7 +305,7 @@ try
 			"   BlobName = $blobName" | Out-File "c:\$scriptName.txt" -Append
 
 			$tmpDir = Get-Random
-			New-Item -Path $scriptRoot -Name $tmpDir -ItemType Directory	
+			New-Item -Path $PSScriptRoot -Name $tmpDir -ItemType Directory	
 
 			$azCopyLogFile = "$PSScriptRoot\azcopylog-$blobName.txt"
 			"   azCopyLogFile = $azCopyLogFile" | Out-File "c:\$scriptName.txt" -Append
